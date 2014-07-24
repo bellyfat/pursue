@@ -1,11 +1,31 @@
 # -*- coding: utf-8 -*-
 
 import json
-import argparse
 
-from finch import Collection, Session
+from finch import Collection
 from booby import Model, fields
-from tornado import httpclient, ioloop
+
+
+class File(Model):
+    name = fields.String()
+
+
+class Files(Collection):
+    model = File
+
+    def __init__(self, account, container, *args, **kwargs):
+        self.account = account
+        self.container = container
+
+        super(Files, self).__init__(*args, **kwargs)
+
+    @property
+    def url(self):
+        return 'https://storage101.iad3.clouddrive.com/v1/{account}/{container}?format=json'.format(
+            account=self.account, container=self.container)
+
+    def decode(self, response):
+        return [{'name': f['name']} for f in json.loads(response.body)]
 
 
 class Container(Model):
@@ -34,30 +54,3 @@ class OpenStackAuth(object):
 
     def __call__(self, request):
         request.headers['x-auth-token'] = self._token
-
-
-def _parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--account-name', required=True)
-    parser.add_argument('--auth-token', required=True)
-
-    return parser.parse_args()
-
-
-if __name__ == '__main__':
-    args = _parse_args()
-
-    containers = Containers(args.account_name, Session(httpclient.AsyncHTTPClient(), auth=OpenStackAuth(token=args.auth_token)))
-
-    def on_containers(containers, error):
-        ioloop.IOLoop.instance().stop()
-
-        if error:
-            raise error
-
-        for container in containers:
-            print container
-
-    containers.all(on_containers)
-
-    ioloop.IOLoop.instance().start()
