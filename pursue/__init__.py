@@ -8,6 +8,10 @@ from booby import Model, fields
 
 class File(Model):
     name = fields.String()
+    hash = fields.String()
+    last_modified = fields.String()
+    bytes = fields.Integer()
+    content_type = fields.String()
 
 
 class Files(Collection):
@@ -23,9 +27,6 @@ class Files(Collection):
     def url(self):
         return 'https://storage101.iad3.clouddrive.com/v1/{account}/{container}?format=json'.format(
             account=self.account, container=self.container)
-
-    def decode(self, response):
-        return [{'name': f['name']} for f in json.loads(response.body)]
 
 
 class Container(Model):
