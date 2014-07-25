@@ -12,6 +12,11 @@ setup(
     author='Jaime Gil de Sagredo Luna',
     author_email='jaimegildesagredo@gmail.com',
     packages=find_packages(exclude=['tests', 'tests.*']),
+    entry_points={
+        'console_scripts': [
+            'pursue = pursue.cli:main'
+        ]
+    },
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Natural Language :: English',
