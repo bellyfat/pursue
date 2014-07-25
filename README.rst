@@ -13,3 +13,18 @@ Pursue
     :target: http://travis-ci.org/jaimegildesagredo/pursue
 
 OpenStack Object Storage Python Client
+
+```bash
+$ pursue --help
+Pursue - OpenStack Object Storage client
+
+Usage:
+    pursue [options] list [<container>]
+    pursue [options] upload <container> <path>
+    pursue [options] download <container> <object>
+
+Options:
+    -h --help   Shows these lines.
+    --account-name <account_name>
+    --auth-token <auth_token
+```
