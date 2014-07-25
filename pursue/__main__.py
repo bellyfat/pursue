@@ -59,7 +59,7 @@ def on_results(results, error):
         raise error
 
     for result in results:
-        print result
+        print result.name
 
 
 def on_uploaded(result, error):
@@ -67,8 +67,6 @@ def on_uploaded(result, error):
 
     if error:
         raise error
-
-    print result
 
 
 def on_downloaded(name, result, error):
