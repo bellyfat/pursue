@@ -23,41 +23,10 @@ from docopt import docopt
 from . import Containers, Objects, Object, OpenStackAuth
 
 
-def _parse_args():
-    return docopt(__doc__)
-
-
-if __name__ == '__main__':
-    args = _parse_args()
+def main():
+    args = parse_args()
 
     session = Session(httpclient.AsyncHTTPClient(), auth=OpenStackAuth(token=args['--auth-token']))
-
-    def on_results(results, error):
-        ioloop.IOLoop.instance().stop()
-
-        if error:
-            raise error
-
-        for result in results:
-            print result
-
-
-    def on_uploaded(result, error):
-        ioloop.IOLoop.instance().stop()
-
-        if error:
-            raise error
-
-        print result
-
-
-    def on_downloaded(name, result, error):
-        ioloop.IOLoop.instance().stop()
-
-        if error:
-            raise error
-
-        result.to_path(name)
 
     account_name = args['--account-name']
     container = args['<container>']
@@ -81,3 +50,39 @@ if __name__ == '__main__':
         objects.get(obj, partial(on_downloaded, obj))
 
     ioloop.IOLoop.instance().start()
+
+
+def on_results(results, error):
+    ioloop.IOLoop.instance().stop()
+
+    if error:
+        raise error
+
+    for result in results:
+        print result
+
+
+def on_uploaded(result, error):
+    ioloop.IOLoop.instance().stop()
+
+    if error:
+        raise error
+
+    print result
+
+
+def on_downloaded(name, result, error):
+    ioloop.IOLoop.instance().stop()
+
+    if error:
+        raise error
+
+    result.to_path(name)
+
+
+def parse_args():
+    return docopt(__doc__)
+
+
+if __name__ == '__main__':
+    main()
