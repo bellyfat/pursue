@@ -1,29 +1,34 @@
 # -*- coding: utf-8 -*-
 
+"""Pursue - OpenStack Object Storage client
+
+Usage:
+    pursue [options] list [<container>]
+    pursue [options] upload <container> <path>
+
+Options:
+    -h --help   Shows these lines.
+    --account-name <account_name>
+    --auth-token <auth_token>
+"""
+
 import sys
-import argparse
 
 from finch import Session
 from tornado import httpclient, ioloop
+from docopt import docopt
 
 from . import Containers, Objects, Object, OpenStackAuth
 
 
 def _parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('command')
-    parser.add_argument('container', nargs='?')
-    parser.add_argument('path', nargs='?')
-    parser.add_argument('--account-name', required=True)
-    parser.add_argument('--auth-token', required=True)
-
-    return parser.parse_args()
+    return docopt(__doc__)
 
 
 if __name__ == '__main__':
     args = _parse_args()
 
-    session = Session(httpclient.AsyncHTTPClient(), auth=OpenStackAuth(token=args.auth_token))
+    session = Session(httpclient.AsyncHTTPClient(), auth=OpenStackAuth(token=args['--auth-token']))
 
     def on_results(results, error):
         ioloop.IOLoop.instance().stop()
@@ -43,19 +48,19 @@ if __name__ == '__main__':
 
         print result
 
-    if args.command == 'list':
-        if args.container is None:
-            containers = Containers(args.account_name, session)
+    account_name = args['--account-name']
+    container = args['<container>']
+
+    if args['list']:
+        if container is None:
+            containers = Containers(account_name, session)
             containers.all(on_results)
         else:
-            objects = Objects(args.account_name, args.container, session)
+            objects = Objects(account_name, container, session)
             objects.all(on_results)
-    elif args.command == 'upload':
-        if args.container is None or args.path is None:
-            print 'You should specify a container name and file path'
-            sys.exit(1)
 
-        objects = Objects(args.account_name, args.container, session)
-        objects.add(Object.from_path(args.path), on_uploaded)
+    elif args['upload']:
+        objects = Objects(account_name, container, session)
+        objects.add(Object.from_path(args['<path>']), on_uploaded)
 
     ioloop.IOLoop.instance().start()

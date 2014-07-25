@@ -1,1 +1,2 @@
 -e git+git://github.com/jaimegildesagredo/finch.git#egg=finch
+docopt==0.6.2
