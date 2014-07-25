@@ -31,6 +31,10 @@ class Object(Model):
             blob=blob
         )
 
+    def to_path(self, path):
+        with open(path, 'wb') as output:
+            output.write(self.blob)
+
     def decode(self, response):
         if response.request.method == 'GET':
             return {'blob': response.body}

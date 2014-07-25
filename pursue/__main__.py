@@ -57,8 +57,7 @@ if __name__ == '__main__':
         if error:
             raise error
 
-        with open(name, 'wb') as output:
-            output.write(result.blob)
+        result.to_path(name)
 
     account_name = args['--account-name']
     container = args['<container>']
