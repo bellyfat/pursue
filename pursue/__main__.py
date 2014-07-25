@@ -5,6 +5,7 @@
 Usage:
     pursue [options] list [<container>]
     pursue [options] upload <container> <path>
+    pursue [options] download <container> <object>
 
 Options:
     -h --help   Shows these lines.
@@ -13,6 +14,7 @@ Options:
 """
 
 import sys
+from functools import partial
 
 from finch import Session
 from tornado import httpclient, ioloop
@@ -48,6 +50,16 @@ if __name__ == '__main__':
 
         print result
 
+
+    def on_downloaded(name, result, error):
+        ioloop.IOLoop.instance().stop()
+
+        if error:
+            raise error
+
+        with open(name, 'wb') as output:
+            output.write(result.blob)
+
     account_name = args['--account-name']
     container = args['<container>']
 
@@ -62,5 +74,11 @@ if __name__ == '__main__':
     elif args['upload']:
         objects = Objects(account_name, container, session)
         objects.add(Object.from_path(args['<path>']), on_uploaded)
+
+    elif args['download']:
+        obj = args['<object>']
+
+        objects = Objects(account_name, container, session)
+        objects.get(obj, partial(on_downloaded, obj))
 
     ioloop.IOLoop.instance().start()

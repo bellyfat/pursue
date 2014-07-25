@@ -32,6 +32,8 @@ class Object(Model):
         )
 
     def decode(self, response):
+        if response.request.method == 'GET':
+            return {'blob': response.body}
         return {}
 
     @property
