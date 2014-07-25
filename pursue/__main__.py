@@ -5,7 +5,7 @@ import argparse
 from finch import Session
 from tornado import httpclient, ioloop
 
-from . import Containers, Files, OpenStackAuth
+from . import Containers, Objects, OpenStackAuth
 
 
 def _parse_args():
@@ -37,7 +37,7 @@ if __name__ == '__main__':
             containers = Containers(args.account_name, session)
             containers.all(on_results)
         else:
-            files = Files(args.account_name, args.name, session)
-            files.all(on_results)
+            objects = Objects(args.account_name, args.name, session)
+            objects.all(on_results)
 
     ioloop.IOLoop.instance().start()

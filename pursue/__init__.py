@@ -6,7 +6,7 @@ from finch import Collection
 from booby import Model, fields
 
 
-class File(Model):
+class Object(Model):
     name = fields.String()
     hash = fields.String()
     last_modified = fields.String()
@@ -14,14 +14,14 @@ class File(Model):
     content_type = fields.String()
 
 
-class Files(Collection):
-    model = File
+class Objects(Collection):
+    model = Object
 
     def __init__(self, account, container, *args, **kwargs):
         self.account = account
         self.container = container
 
-        super(Files, self).__init__(*args, **kwargs)
+        super(Objects, self).__init__(*args, **kwargs)
 
     @property
     def url(self):
