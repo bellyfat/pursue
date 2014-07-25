@@ -8,8 +8,6 @@ from functools import partial
 from finch import Collection
 from booby import Model, fields
 
-DEFAULT_TIMEOUT = 60*3
-
 
 class Object(Model):
     name = fields.String()
@@ -68,8 +66,7 @@ class Objects(Collection):
                 'Content-Length': obj.bytes
             },
             body=obj.blob,
-            callback=partial(self.on_add, callback, obj),
-            request_timeout=DEFAULT_TIMEOUT)
+            callback=partial(self.on_add, callback, obj))
 
 
 class Container(Model):

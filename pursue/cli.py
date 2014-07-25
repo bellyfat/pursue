@@ -22,11 +22,17 @@ from docopt import docopt
 
 from . import Containers, Objects, Object, OpenStackAuth
 
+DEFAULT_TIMEOUT = 60*3
+
 
 def main():
     args = _parse_args()
 
-    session = Session(httpclient.AsyncHTTPClient(), auth=OpenStackAuth(token=args['--auth-token']))
+    session = Session(
+        httpclient.AsyncHTTPClient(defaults={
+            'request_timeout': DEFAULT_TIMEOUT
+        }),
+        auth=OpenStackAuth(token=args['--auth-token']))
 
     account_name = args['--account-name']
     container = args['<container>']
