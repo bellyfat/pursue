@@ -11,10 +11,12 @@ Options:
     -h --help   Shows these lines.
     --account-name <account_name>
     --auth-token <auth_token>
+    --secret <path>
 """
 
 from functools import partial
 
+from cryptography.fernet import Fernet as encrypt_service
 from finch import Session
 from tornado import httpclient, ioloop
 from docopt import docopt
@@ -35,6 +37,11 @@ def main():
     account_name = args['--account-name']
     container = args['<container>']
 
+    secret_key = None
+    if args['--secret']:
+        with open(args['--secret']) as secret_file:
+            secret_key = secret_file.read()
+
     if args['list']:
         if container is None:
             containers = Containers(account_name, session)
@@ -43,17 +50,24 @@ def main():
             objects = Objects(account_name, container, session)
             objects.all(_on_results)
 
+        ioloop.IOLoop.instance().start()
+
     elif args['upload']:
         objects = Objects(account_name, container, session)
-        objects.add(Object.from_path(args['<path>']), _on_uploaded)
+        obj = Object.from_path(args['<path>'])
+
+        if secret_key is not None:
+            obj.blob = encrypt_service(secret_key).encrypt(obj.blob)
+
+        objects.add(obj, _on_uploaded)
+        ioloop.IOLoop.instance().start()
 
     elif args['download']:
         obj = args['<object>']
-
         objects = Objects(account_name, container, session)
-        objects.get(obj, partial(_on_downloaded, obj))
+        objects.get(obj, partial(_on_downloaded, obj, secret_key))
+        ioloop.IOLoop.instance().start()
 
-    ioloop.IOLoop.instance().start()
 
 
 def _on_results(results, error):
@@ -73,11 +87,14 @@ def _on_uploaded(result, error):
         raise error
 
 
-def _on_downloaded(name, result, error):
+def _on_downloaded(name, secret_key, result, error):
     ioloop.IOLoop.instance().stop()
 
     if error:
         raise error
+
+    if secret_key is not None:
+        result.blob = encrypt_service(secret_key).decrypt(result.blob)
 
     result.to_path(name)
 
