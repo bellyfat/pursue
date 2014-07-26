@@ -13,7 +13,6 @@ Options:
     --auth-token <auth_token>
 """
 
-import sys
 from functools import partial
 
 from finch import Session
@@ -29,9 +28,8 @@ def main():
     args = _parse_args()
 
     session = Session(
-        httpclient.AsyncHTTPClient(defaults={
-            'request_timeout': DEFAULT_TIMEOUT
-        }),
+        httpclient.AsyncHTTPClient(
+            defaults={'request_timeout': DEFAULT_TIMEOUT}),
         auth=OpenStackAuth(token=args['--auth-token']))
 
     account_name = args['--account-name']
