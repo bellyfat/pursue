@@ -2,7 +2,7 @@
 
 import json
 import mimetypes
-from os.path import basename, getsize
+from os.path import basename
 from functools import partial
 
 from finch import Collection
@@ -24,7 +24,6 @@ class Object(Model):
 
         return cls(
             name=basename(path).replace(' ', '_'),
-            bytes=getsize(path),
             content_type=mimetypes.guess_type(path)[0],
             blob=blob
         )
@@ -61,10 +60,7 @@ class Objects(Collection):
         self.client.fetch(
             obj.url.format(account=self.account, container=self.container, name=obj.name),
             method='PUT',
-            headers={
-                'Content-Type': obj.content_type or '',
-                'Content-Length': obj.bytes
-            },
+            headers={'Content-Type': obj.content_type or ''},
             body=obj.blob,
             callback=partial(self.on_add, callback, obj))
 
