@@ -24,8 +24,11 @@ OpenStack Object Storage Python Client
         pursue [options] list [<container>]
         pursue [options] upload <container> <path>
         pursue [options] download <container> <object>
+        pursue [options] delete <container> [<object>]
+        pursue [options] keygen <path>
 
     Options:
         -h --help   Shows these lines.
         --account-name <account_name>
-        --auth-token <auth_token
+        --auth-token <auth_token>
+        --secret <path>
