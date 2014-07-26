@@ -6,6 +6,7 @@ Usage:
     pursue [options] list [<container>]
     pursue [options] upload <container> <path>
     pursue [options] download <container> <object>
+    pursue [options] keygen <path>
 
 Options:
     -h --help   Shows these lines.
@@ -68,6 +69,9 @@ def main():
         objects.get(obj, partial(_on_downloaded, obj, secret_key))
         ioloop.IOLoop.instance().start()
 
+    elif args['keygen']:
+        with open(args['<path>'], 'w') as output:
+            output.write(encrypt_service.generate_key())
 
 
 def _on_results(results, error):
