@@ -6,6 +6,7 @@ Usage:
     pursue [options] list [<container>]
     pursue [options] upload <container> <path>
     pursue [options] download <container> <object>
+    pursue [options] delete <container> [<object>]
     pursue [options] keygen <path>
 
 Options:
@@ -22,7 +23,7 @@ from finch import Session
 from tornado import httpclient, ioloop
 from docopt import docopt
 
-from . import Containers, Objects, Object, OpenStackAuth
+from . import Containers, Container, Objects, Object, OpenStackAuth
 
 DEFAULT_TIMEOUT = 60*3
 
@@ -69,6 +70,18 @@ def main():
         objects.get(obj, partial(_on_downloaded, obj, secret_key))
         ioloop.IOLoop.instance().start()
 
+    elif args['delete']:
+        obj = args['<object>']
+
+        if obj is None:
+            containers = Containers(account_name, session)
+            containers.delete(Container(name=container), _on_deleted)
+        else:
+            objects = Objects(account_name, container, session)
+            objects.delete(Object(name=obj), _on_deleted)
+
+        ioloop.IOLoop.instance().start()
+
     elif args['keygen']:
         with open(args['<path>'], 'w') as output:
             output.write(encrypt_service.generate_key())
@@ -85,6 +98,12 @@ def _on_results(results, error):
 
 
 def _on_uploaded(result, error):
+    ioloop.IOLoop.instance().stop()
+
+    if error:
+        raise error
+
+def _on_deleted(error):
     ioloop.IOLoop.instance().stop()
 
     if error:
