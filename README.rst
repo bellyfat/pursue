@@ -12,8 +12,19 @@ Pursue
 .. image:: https://secure.travis-ci.org/jaimegildesagredo/pursue.svg?branch=master
     :target: http://travis-ci.org/jaimegildesagredo/pursue
 
-OpenStack Object Storage Python Client
+OpenStack Object Storage Python Client featuring client-side object encryption.
 
+Installation
+------------
+
+.. code-block:: bash
+
+    $ git clone https://github.com/jaimegildesagredo/pursue.git
+    $ cd pursue
+    $ python setup.py install && pip install -r requirements.txt
+
+Usage
+-----
 
 .. code-block:: bash
 
